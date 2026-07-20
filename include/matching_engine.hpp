@@ -16,6 +16,7 @@ namespace matching {
 
     class MatchingEngine {
     public:
+        // a method to submit a new order
         SubmitResult submit_limit_order(
             Side side,
             Price price,
