@@ -19,5 +19,4 @@ namespace matching {
         // bids_
         // asks_
     };
-
 };
