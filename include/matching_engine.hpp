@@ -8,27 +8,27 @@
 
 namespace matching {
 
-struct SubmitResult {
-    OrderId order_id;
-    Quantity remaining_quantity;
-    std::vector<Trade> trades;
-};
+    struct SubmitResult {
+        OrderId order_id;
+        Quantity remaining_quantity;
+        std::vector<Trade> trades;
+    };
 
-class MatchingEngine {
-public:
-    SubmitResult submit_limit_order(
-        Side side,
-        Price price,
-        Quantity quantity
-    );
+    class MatchingEngine {
+    public:
+        SubmitResult submit_limit_order(
+            Side side,
+            Price price,
+            Quantity quantity
+        );
 
-    bool cancel_order(OrderId order_id);
+        bool cancel_order(OrderId order_id);
 
-    void print_book() const;
+        void print_book() const;
 
-private:
-    OrderId next_order_id_{1};
-    OrderBook order_book_;
-};
+    private:
+        OrderId next_order_id_{1};
+        OrderBook order_book_;
+    };
 
 } // namespace matching
