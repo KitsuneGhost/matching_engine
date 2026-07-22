@@ -8,7 +8,7 @@
 #include <string_view>
 #include <utility>
 
-namespace {
+namespace tests {
 
 using matching::MatchingEngine;
 using matching::Price;
@@ -116,21 +116,21 @@ struct TestCase {
     std::function<void()> function;
 };
 
-} // namespace
+} // end of namespace tests
 
 int main() {
-    const TestCase tests[] = {
-        {"unmatched order rests", test_unmatched_order_rests},
-        {"full fill", test_full_fill},
-        {"partial fill and remainder", test_partial_fill_and_resting_remainder},
-        {"price then time priority", test_price_then_time_priority},
-        {"cancellation", test_cancellation},
-        {"input validation", test_input_validation},
+    const tests::TestCase tests[] = {
+        {"unmatched order rests", tests::test_unmatched_order_rests},
+        {"full fill", tests::test_full_fill},
+        {"partial fill and remainder", tests::test_partial_fill_and_resting_remainder},
+        {"price then time priority", tests::test_price_then_time_priority},
+        {"cancellation", tests::test_cancellation},
+        {"input validation", tests::test_input_validation},
     };
 
     int failures = 0;
 
-    for (const TestCase& test : tests) {
+    for (const tests::TestCase& test : tests) {
         try {
             test.function();
             std::cout << "PASS: " << test.name << '\n';
