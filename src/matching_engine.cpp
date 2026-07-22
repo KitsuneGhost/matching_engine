@@ -2,7 +2,6 @@
 
 #include <stdexcept>
 #include <utility>
-#include <vector>
 
 namespace matching {
 
@@ -31,13 +30,13 @@ namespace matching {
 
         const OrderId order_id = order.id;
 
-        // a vector with a new trade
-        std::vector<Trade> trades = order_book_.add_order(order).trades;
+        // a struct with the result data
+        AddOrderResult result = order_book_.add_order(order);
 
         return SubmitResult{
             .order_id = order_id,
-            .remaining_quantity = order.quantity,
-            .trades = std::move(trades)
+            .remaining_quantity = result.remaining_quantity,
+            .trades = std::move(result.trades)
         };
     }
 
