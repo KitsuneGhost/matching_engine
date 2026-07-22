@@ -32,7 +32,7 @@ namespace matching {
         const OrderId order_id = order.id;
 
         // a vector with a new trade
-        std::vector<Trade> trades = order_book_.add_order(order);
+        std::vector<Trade> trades = order_book_.add_order(order).trades;
 
         return SubmitResult{
             .order_id = order_id,
