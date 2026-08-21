@@ -22,6 +22,11 @@ namespace matching {
             AddOrderResult add_order(Order order);
             bool cancel_order(OrderId order_id);
             void print_book() const;
+            Order get_best_bid();
+            Order get_best_ask();
+            Quantity get_bids_quantity_at(Price price) const;
+            Quantity get_asks_quantity_at(Price price) const;
+            Order get_order(OrderId id) const;
 
         private:
             using OrderQueue = std::deque<Order>;

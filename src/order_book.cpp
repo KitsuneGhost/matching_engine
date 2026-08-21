@@ -1,4 +1,6 @@
 #include "order_book.hpp"
+#include "order.hpp"
+#include "types.hpp"
 
 #include <algorithm>
 #include <iostream>
@@ -231,6 +233,26 @@ namespace matching {
         }
 
         std::cout << "==================\n";
+    }
+
+    Order OrderBook::get_best_bid() {
+        auto best_bid_it = bids_.begin();
+
+        OrderQueue& orders = best_bid_it->second;
+        return orders.front();
+    }
+
+    Order OrderBook::get_best_ask() {
+        auto best_ask_it = asks_.begin();
+
+        OrderQueue& asks = best_ask_it->second;
+        return asks.front();
+    }
+
+    Quantity OrderBook::get_bids_quantity_at(Price price) {
+        auto bids = bids_.begin();
+
+
     }
 
 }; // end of namespace matching
