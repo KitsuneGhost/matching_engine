@@ -1,5 +1,8 @@
 #include "matching_engine.hpp"
+#include "order.hpp"
+#include "types.hpp"
 
+#include <optional>
 #include <stdexcept>
 #include <utility>
 
@@ -45,6 +48,26 @@ namespace matching {
 
     void MatchingEngine::print_book() const {
         order_book_.print_book();
+    }
+
+    std::optional<Order> MatchingEngine::get_best_bid() const {
+        return order_book_.get_best_bid();
+    }
+
+    std::optional<Order> MatchingEngine::get_best_ask() const {
+        return order_book_.get_best_ask();
+    }
+
+    Quantity MatchingEngine::get_bids_quantity_at(Price price) const {
+        return order_book_.get_bids_quantity_at(price);
+    }
+
+    Quantity MatchingEngine::get_asks_quantity_at(Price price) const {
+        return order_book_.get_asks_quantity_at(price);
+    }
+
+    std::optional<Order> MatchingEngine::get_order(OrderId id) const {
+        return order_book_.get_order(id);
     }
 
 } // end of namespace matching
