@@ -17,7 +17,6 @@ namespace matching {
 
         if (quantity <= 0) {
             throw std::invalid_argument("Quantity must be greater than 0!");
-
         }
 
         // creating a new order

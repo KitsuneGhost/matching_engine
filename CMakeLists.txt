@@ -4,6 +4,9 @@ project(matching_engine VERSION 0.1.0 LANGUAGES CXX)
 
 include(CTest)
 
+# Export the exact compiler flags and include paths for clangd-based editors.
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 add_library(matching_engine_core
     src/matching_engine.cpp
     src/order_book.cpp
