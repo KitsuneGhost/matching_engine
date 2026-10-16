@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <iostream>
 #include <vector>
+#include <optional>
 
 namespace matching {
 
@@ -235,24 +236,77 @@ namespace matching {
         std::cout << "==================\n";
     }
 
-    Order OrderBook::get_best_bid() {
+    std::optional<Order> OrderBook::get_best_bid() const {
+        if (bids_.empty()) return std::nullopt;     // in case the map is empty to avoid dereferencing .begin()
         auto best_bid_it = bids_.begin();
 
-        OrderQueue& orders = best_bid_it->second;
+        const OrderQueue& orders = best_bid_it->second;
         return orders.front();
     }
 
-    Order OrderBook::get_best_ask() {
+    std::optional<Order> OrderBook::get_best_ask() const {
+        if (asks_.empty()) return std::nullopt;
         auto best_ask_it = asks_.begin();
 
-        OrderQueue& asks = best_ask_it->second;
+        const OrderQueue& asks = best_ask_it->second;
         return asks.front();
     }
 
-    Quantity OrderBook::get_bids_quantity_at(Price price) {
-        auto bids = bids_.begin();
+    Quantity OrderBook::get_bids_quantity_at(Price price) const {
+        auto it = bids_.find(price); // iterator
+        if (it == bids_.end()) return 0;
 
+        const auto& orders = it->second;
+        Quantity quantity = 0;
 
+        for (const Order& order : orders) {
+            quantity += order.quantity;
+        }
+
+        return quantity;
     }
 
+    Quantity OrderBook::get_asks_quantity_at(Price price) const {
+        auto it = asks_.find(price);
+        if (it == asks_.end()) return 0;
+
+        const auto& orders = it->second;
+        Quantity quantity = 0;
+
+        for (const Order& order : orders) {
+            quantity += order.quantity;
+        }
+
+        return quantity;
+    }
+
+    std::optional<Order> OrderBook::get_order(OrderId id) const {
+        // looking for order with order_id == id in bids using lambda function
+        for (auto& [price, orders] : bids_) {
+            auto it = std::find_if(
+                orders.begin(),
+                orders.end(),
+                [id](const Order& order) {
+                    return order.id == id;
+                }
+            );
+
+            if (it != orders.end()) return *it; // dereferencing the iterator
+        }
+
+        // looking for order with order_id == id in asks using lambda function
+        for (auto& [price, orders] : asks_) {
+            auto it = std::find_if(
+                orders.begin(),
+                orders.end(),
+                [id](const Order& order) {
+                    return order.id == id;
+                }
+            );
+
+            if (it != orders.end()) return *it;
+        }
+
+        return std::nullopt;
+    }
 }; // end of namespace matching

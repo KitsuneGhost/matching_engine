@@ -7,6 +7,7 @@
 #include <deque>
 #include <functional>
 #include <map>
+#include <optional>
 #include <vector>
 
 namespace matching {
@@ -22,11 +23,11 @@ namespace matching {
             AddOrderResult add_order(Order order);
             bool cancel_order(OrderId order_id);
             void print_book() const;
-            Order get_best_bid();
-            Order get_best_ask();
+            std::optional<Order> get_best_bid() const;
+            std::optional<Order> get_best_ask() const;
             Quantity get_bids_quantity_at(Price price) const;
             Quantity get_asks_quantity_at(Price price) const;
-            Order get_order(OrderId id) const;
+            std::optional<Order> get_order(OrderId id) const;
 
         private:
             using OrderQueue = std::deque<Order>;
