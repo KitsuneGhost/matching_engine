@@ -58,6 +58,14 @@ cmake -S . -B build -DBUILD_TESTING=OFF
 
 Prices are signed integers (think of them as integer ticks); quantities are unsigned integers.
 
+Order IDs are assigned sequentially per engine instance. Usable IDs range from `1` through `std::numeric_limits<OrderId>::max() - 1` (inclusive). With the current `uint64_t` type, the last usable ID is `18446744073709551614`. Zero and the maximum value are never assigned. Once the ID space is exhausted, submissions return `Status::Error` without changing the book; IDs are not reused after fills or cancellations.
+
+The number of available order IDs is finite, but exhausting them would take centuries even at a hypothetical rate of one billion new orders per second: `(2^64 - 2) / (1,000,000,000 × 60 × 60 × 24 × 365.25) ≈ 584.5 years`. This illustrates the ID capacity, not the engine's measured throughput.
+
+An exhaustion rejection returns `SubmitResult` with `status == Status::Error` and `order_id == 0`, meaning no order was created. Callers should check `status` before using `order_id`. Invalid input throws `std::invalid_argument` instead of returning a result.
+
+Price-level quantity queries and book printing throw `std::overflow_error` if a level's aggregate quantity exceeds the range of `Quantity`. Submissions currently allow such levels; overflow is detected when computing their totals.
+
 An incoming buy order matches the best ask while that ask is less than or equal to the buy limit. An incoming sell order matches the best bid while that bid is greater than or equal to the sell limit. Trades execute at the resting order's price.
 
 For example, if sells of `5 @ 100` and `4 @ 101` are resting, an incoming buy of `7 @ 101` produces:

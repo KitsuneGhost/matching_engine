@@ -4,6 +4,8 @@
 
 #include <algorithm>
 #include <iostream>
+#include <limits>
+#include <stdexcept>
 #include <vector>
 #include <optional>
 
@@ -59,7 +61,7 @@ namespace matching {
                 sell_order.quantity -= traded_quantity;
 
                 // if sell order ran out of product - pick next best order
-                if (sell_order.quantity == 0) {
+                if (sell_order.quantity <= 0) {
                     orders_at_price.pop_front();
                 }
             }
@@ -113,7 +115,7 @@ namespace matching {
                 order.quantity -= traded_quantity;
                 buy_order.quantity -= traded_quantity;
 
-                if (buy_order.quantity == 0) {
+                if (buy_order.quantity <= 0) {
                     orders_at_price.pop_front();
                 }
             }
@@ -206,6 +208,9 @@ namespace matching {
             Quantity total_quantity = 0;
 
             for (const Order& order : orders) {
+                if (order.quantity > std::numeric_limits<Quantity>::max() - total_quantity) {
+                    throw std::overflow_error("Price-level quantity overflow!");
+                }
                 total_quantity += order.quantity;
             }
 
@@ -223,6 +228,9 @@ namespace matching {
             Quantity total_quantity = 0;
 
             for (const Order& order : orders) {
+                if (order.quantity > std::numeric_limits<Quantity>::max() - total_quantity) {
+                    throw std::overflow_error("Price-level quantity overflow!");
+                }
                 total_quantity += order.quantity;
             }
 
@@ -260,6 +268,10 @@ namespace matching {
         Quantity quantity = 0;
 
         for (const Order& order : orders) {
+            // checking for overflows
+            if (order.quantity > std::numeric_limits<Quantity>::max() - quantity) {
+                throw std::overflow_error("Price-level quantity overflow!");
+            }
             quantity += order.quantity;
         }
 
@@ -267,6 +279,7 @@ namespace matching {
     }
 
     Quantity OrderBook::get_asks_quantity_at(Price price) const {
+        // this method is almost identical to OrderBook::get_bids_quantity_at
         auto it = asks_.find(price);
         if (it == asks_.end()) return 0;
 
@@ -274,6 +287,9 @@ namespace matching {
         Quantity quantity = 0;
 
         for (const Order& order : orders) {
+            if (order.quantity > std::numeric_limits<Quantity>::max() - quantity) {
+                throw std::overflow_error("Price-level quantity overflow!");
+            }
             quantity += order.quantity;
         }
 
