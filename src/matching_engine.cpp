@@ -2,8 +2,10 @@
 #include "order.hpp"
 #include "types.hpp"
 
+#include <limits>
 #include <optional>
 #include <stdexcept>
+#include <sys/types.h>
 #include <utility>
 
 namespace matching {
@@ -22,6 +24,16 @@ namespace matching {
             throw std::invalid_argument("Quantity must be greater than 0!");
         }
 
+        if (side != Side::Buy && side != Side::Sell) {
+            throw std::invalid_argument("Side can only be BUY or SELL");
+        }
+
+        if (next_order_id_ >= std::numeric_limits<OrderId>::max()) {
+            return SubmitResult {
+                .status = Status::Error,
+                .message = "Order ID space is exhausted!"
+            };
+        }
         // creating a new order
         Order order{
             .id = next_order_id_++,
@@ -35,10 +47,12 @@ namespace matching {
         // a struct with the result data
         AddOrderResult result = order_book_.add_order(order);
 
-        return SubmitResult{
+        return SubmitResult {
+            .status = Status::Success,
             .order_id = order_id,
             .remaining_quantity = result.remaining_quantity,
-            .trades = std::move(result.trades)
+            .trades = std::move(result.trades),
+            .message = "Order submitted successfully!"
         };
     }
 

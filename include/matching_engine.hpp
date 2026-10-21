@@ -10,9 +10,11 @@
 namespace matching {
 
     struct SubmitResult {
+        Status status;
         OrderId order_id;
         Quantity remaining_quantity;
         std::vector<Trade> trades;
+        Message message;
     };
 
     class MatchingEngine {
