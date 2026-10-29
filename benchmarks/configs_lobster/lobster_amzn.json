@@ -1,0 +1,17 @@
+{
+  "name": "lobster_amzn",
+  "cancel_percent": 48.33680484863671,
+  "seed": 20261029,
+  "prefill_orders": 20000,
+  "measured_commands": 20000,
+  "price_levels_per_side": 100,
+  "max_quantity": 100,
+  "aggressive_submit_percent": 20,
+  "repetitions": 5,
+  "calibration": {
+    "source_url": "https://php.lobsterdata.com/info/sample/LOBSTER_SampleFile_AMZN_2012-06-21_10.zip",
+    "message_sha256": "c85a75b51f3616a683f825c2e03f984535e9329a8be5ab12325130d32223a2c5",
+    "formula": "type3 / (type1 + type3)",
+    "scope": "Cancellation frequency only; other synthetic generator parameters unchanged."
+  }
+}

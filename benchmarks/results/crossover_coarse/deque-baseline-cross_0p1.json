@@ -1,0 +1,109 @@
+{
+  "engine": "deque-baseline",
+  "commit": "0e66556cd827a073bd152f2b899b6cb526e03327",
+  "config": {
+    "name": "cross_0p1",
+    "cancel_percent": 0.1,
+    "seed": 20261029,
+    "prefill_orders": 20000,
+    "measured_commands": 20000,
+    "price_levels_per_side": 100,
+    "max_quantity": 100,
+    "aggressive_submit_percent": 20,
+    "repetitions": 5
+  },
+  "trace": {
+    "trace_sha256": "58b350cc85261488bc9ac01453863a57d0dd30f1f6f18177afc645cbcc28fbe2",
+    "cancellation_commands": 20,
+    "submission_commands": 19980,
+    "executed_trades": 7768,
+    "active_min": 20000,
+    "active_max": 32128,
+    "active_final": 32127,
+    "events_digest": 13482304942352262448,
+    "state_digest": 6331082153149664175,
+    "actual_cancel_percent": 0.1
+  },
+  "summary": {
+    "throughput_median_ops_s": 4265802.130768164,
+    "throughput_min_ops_s": 4098647.0570996865,
+    "throughput_max_ops_s": 4351647.022244097,
+    "process_peak_rss_kib": 24096,
+    "submit_p50_ns": null,
+    "submit_p99_ns": null,
+    "cancel_p50_ns": null,
+    "cancel_p99_ns": null
+  },
+  "runs": [
+    {
+      "elapsed_ns": 4688450,
+      "operations": 20000,
+      "active_final": 32127,
+      "events_digest": 13482304942352262448,
+      "state_digest": 6331082153149664175,
+      "process_peak_rss_kib": 24092,
+      "submit_p50_ns": 0,
+      "submit_p99_ns": 0,
+      "cancel_p50_ns": 0,
+      "cancel_p99_ns": 0,
+      "repetition": 1,
+      "mode": "batch"
+    },
+    {
+      "elapsed_ns": 4879659,
+      "operations": 20000,
+      "active_final": 32127,
+      "events_digest": 13482304942352262448,
+      "state_digest": 6331082153149664175,
+      "process_peak_rss_kib": 24092,
+      "submit_p50_ns": 0,
+      "submit_p99_ns": 0,
+      "cancel_p50_ns": 0,
+      "cancel_p99_ns": 0,
+      "repetition": 2,
+      "mode": "batch"
+    },
+    {
+      "elapsed_ns": 4639940,
+      "operations": 20000,
+      "active_final": 32127,
+      "events_digest": 13482304942352262448,
+      "state_digest": 6331082153149664175,
+      "process_peak_rss_kib": 24096,
+      "submit_p50_ns": 0,
+      "submit_p99_ns": 0,
+      "cancel_p50_ns": 0,
+      "cancel_p99_ns": 0,
+      "repetition": 3,
+      "mode": "batch"
+    },
+    {
+      "elapsed_ns": 4595961,
+      "operations": 20000,
+      "active_final": 32127,
+      "events_digest": 13482304942352262448,
+      "state_digest": 6331082153149664175,
+      "process_peak_rss_kib": 24096,
+      "submit_p50_ns": 0,
+      "submit_p99_ns": 0,
+      "cancel_p50_ns": 0,
+      "cancel_p99_ns": 0,
+      "repetition": 4,
+      "mode": "batch"
+    },
+    {
+      "elapsed_ns": 4693650,
+      "operations": 20000,
+      "active_final": 32127,
+      "events_digest": 13482304942352262448,
+      "state_digest": 6331082153149664175,
+      "process_peak_rss_kib": 24096,
+      "submit_p50_ns": 0,
+      "submit_p99_ns": 0,
+      "cancel_p50_ns": 0,
+      "cancel_p99_ns": 0,
+      "repetition": 5,
+      "mode": "batch"
+    }
+  ]
+}

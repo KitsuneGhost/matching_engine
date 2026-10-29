@@ -93,3 +93,9 @@ This first release intentionally supports one in-memory order book and limit ord
 ## Version
 
 Current toy release: **0.1.0**
+
+## Preserved deque baseline
+
+This branch, `deque-baseline`, preserves the original deque-based engine from commit `0e66556cd827a073bd152f2b899b6cb526e03327`. Engine source, public headers, tests, and build configuration are unchanged. Only benchmark tooling, measurements, and documentation have been added.
+
+The indexed-list successor is maintained on `main`. The [comparison report](benchmarks/STAGE1_REPORT.md) includes controlled cancellation workloads, LOBSTER-frequency-calibrated workloads, and a crossover search. Published result labels use `deque-baseline` for this engine and `main` for the indexed version. Results identify the exact source commits measured; the runner defaults to those pinned commits rather than moving branch tips. See [reproduction instructions](benchmarks/README.md).
