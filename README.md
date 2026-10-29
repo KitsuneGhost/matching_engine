@@ -15,8 +15,8 @@ It accepts buy and sell limit orders, matches crossing orders, records trades, a
   - Orders at the same price are matched first-in, first-out (FIFO).
 - Partial fills and resting remainders
 - Trade records with buy ID, sell ID, quantity, and execution price
-- Order cancellation
-- Input validation for zero quantity and non-positive prices
+- Indexed order lookup and cancellation
+- Input validation for invalid sides, zero quantity, and non-positive prices
 - Dependency-free tests run through CTest
 
 ## Requirements
@@ -76,6 +76,34 @@ For example, if sells of `5 @ 100` and `4 @ 101` are resting, an incoming buy of
 ```
 
 The remaining `2 @ 101` stays in the book.
+
+## Order storage design
+
+This version replaces the original per-price `std::deque<Order>` queues with `std::list<Order>` queues and adds an `std::unordered_map` index keyed by order ID. The bid and ask maps still sort price levels, and orders within each level still execute FIFO.
+
+Each index entry stores a private `OrderLocation`: the order's side, price, and iterator into its owning list. Lookup dereferences that iterator and returns a copy of the order. Cancellation uses the side and price to find the owning list, then erases the order directly through the iterator.
+
+Resting orders are indexed after insertion. Partial fills preserve their position and index entry; full fills remove the index entry before deleting the list node. Cancellation removes both the node and its index entry. Empty price levels are removed from the corresponding map. Fully filled incoming orders never enter the index.
+
+| Operation | Cost |
+|---|---|
+| Lookup by order ID | Average `O(1)` |
+| Cancel by order ID | Average `O(1)` index lookup plus `O(log P)` price-level lookup |
+| Append to an existing level's list | `O(1)`, excluding map lookup and index insertion |
+| Erase a list node using its iterator | `O(1)` |
+| Query quantity at a price | `O(log P + K)` |
+
+Here, `P` is the number of price levels on the relevant side and `K` is the number of orders at the queried level. Hash-table operations have worst-case linear complexity in the number of indexed orders.
+
+Lists provide stable iterators and efficient arbitrary removal, at the cost of node overhead, per-node allocations, and poorer cache locality than deques. The [benchmark suite](benchmarks/README.md) compares committed versions on `deque-baseline` and `main` with 30%, 50%, and 70% cancellation-command workloads. See the [measured comparison and six individual reports](benchmarks/results/latest/REPORT.md) for results, workload definitions, and limitations; these synthetic measurements do not establish production capacity.
+
+Additional experiments use [cancellation frequencies measured from LOBSTER samples](benchmarks/analysis/lobster/REPORT.md), with [per-engine calibrated results](benchmarks/results/lobster/REPORT.md). A separate [crossover experiment](benchmarks/results/crossover_refined/CROSSOVER.md) searches for the smallest tested cancellation ratio at which the indexed design consistently improves total throughput. Calibration currently covers cancellation frequency only; it is not historical market replay, and the crossover depends on the workload and hardware.
+
+The [combined experiment report](benchmarks/STAGE1_REPORT.md) summarizes the LOBSTER calibration and crossover findings.
+
+`OrderBook` is non-copyable, which also makes `MatchingEngine` non-copyable. A default copy would duplicate the lists while leaving copied index iterators pointing into the original book. Supporting copies would require rebuilding the index for the copied lists. Neither class currently supports moving.
+
+Allocation-failure recovery remains unfinished: if index insertion throws after a list append, the appended order is not rolled back. The current implementation does not guarantee that the book and index remain synchronized after an allocation failure during submission.
 
 ## Project layout
 

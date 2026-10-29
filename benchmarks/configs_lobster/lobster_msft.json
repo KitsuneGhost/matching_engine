@@ -1,0 +1,17 @@
+{
+  "name": "lobster_msft",
+  "cancel_percent": 47.667086410617564,
+  "seed": 20261029,
+  "prefill_orders": 20000,
+  "measured_commands": 20000,
+  "price_levels_per_side": 100,
+  "max_quantity": 100,
+  "aggressive_submit_percent": 20,
+  "repetitions": 5,
+  "calibration": {
+    "source_url": "https://php.lobsterdata.com/info/sample/LOBSTER_SampleFile_MSFT_2012-06-21_10.zip",
+    "message_sha256": "669e5c35b1eab0f7336fa9ed919002e65b08d2aabd96bb4ae88d647184e7a18d",
+    "formula": "type3 / (type1 + type3)",
+    "scope": "Cancellation frequency only; other synthetic generator parameters unchanged."
+  }
+}

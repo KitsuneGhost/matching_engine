@@ -1,0 +1,11 @@
+{
+  "name": "cross_5",
+  "cancel_percent": 5,
+  "seed": 20261029,
+  "prefill_orders": 20000,
+  "measured_commands": 20000,
+  "price_levels_per_side": 100,
+  "max_quantity": 100,
+  "aggressive_submit_percent": 20,
+  "repetitions": 5
+}
