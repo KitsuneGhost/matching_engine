@@ -1,0 +1,110 @@
+[
+  {
+    "archive": "LOBSTER_SampleFile_AAPL_2012-06-21_10.zip",
+    "source_url": "https://php.lobsterdata.com/info/sample/LOBSTER_SampleFile_AAPL_2012-06-21_10.zip",
+    "archive_sha256": "326839316d67d7819ca0541ffdf73cdb044d6ae4105cce0ef9c615e8848e9d43",
+    "message_file": "AAPL_2012-06-21_34200000_57600000_message_10.csv",
+    "message_sha256": "6562394b996138d5c4527b1282e77a1a385e844110550c34628fbd73bc5411e5",
+    "first_time_seconds": "34200.004241176",
+    "last_time_seconds": "57599.913117637",
+    "total_events": 400391,
+    "counts": {
+      "1": 191015,
+      "2": 3260,
+      "3": 171126,
+      "4": 23658,
+      "5": 11332,
+      "6": 0,
+      "7": 0
+    },
+    "event_percent": {
+      "1": 47.707116293822786,
+      "2": 0.8142041154771211,
+      "3": 42.73972192182142,
+      "4": 5.908724222072924,
+      "5": 2.8302334468057473,
+      "6": 0.0,
+      "7": 0.0
+    },
+    "cancellation_event_percent": 43.55392603729854,
+    "full_delete_supported_command_percent": 47.25397013870288,
+    "combined_cancel_add_command_percent": 47.724554667338076,
+    "observed_submissions": 191015,
+    "observed_submissions_later_canceled": 165018,
+    "observed_submissions_with_later_cancel_percent": 86.390074077952,
+    "submission_size_median": 100,
+    "submission_buy_percent": 43.20079574902495
+  },
+  {
+    "archive": "LOBSTER_SampleFile_AMZN_2012-06-21_10.zip",
+    "source_url": "https://php.lobsterdata.com/info/sample/LOBSTER_SampleFile_AMZN_2012-06-21_10.zip",
+    "archive_sha256": "5cff62a609b27aef82285382ad646c4c2facc0a692a60bedda633de64c4aa54f",
+    "message_file": "AMZN_2012-06-21_34200000_57600000_message_10.csv",
+    "message_sha256": "c85a75b51f3616a683f825c2e03f984535e9329a8be5ab12325130d32223a2c5",
+    "first_time_seconds": "34200.017459617",
+    "last_time_seconds": "57599.95935965",
+    "total_events": 269748,
+    "counts": {
+      "1": 131954,
+      "2": 2917,
+      "3": 123458,
+      "4": 8974,
+      "5": 2445,
+      "6": 0,
+      "7": 0
+    },
+    "event_percent": {
+      "1": 48.917508192831825,
+      "2": 1.0813796580512183,
+      "3": 45.76790189361923,
+      "4": 3.326808725180539,
+      "5": 0.906401530317185,
+      "6": 0.0,
+      "7": 0.0
+    },
+    "cancellation_event_percent": 46.84928155167045,
+    "full_delete_supported_command_percent": 48.33680484863671,
+    "combined_cancel_add_command_percent": 48.920175435200846,
+    "observed_submissions": 131954,
+    "observed_submissions_later_canceled": 117594,
+    "observed_submissions_with_later_cancel_percent": 89.11741970686755,
+    "submission_size_median": 100.0,
+    "submission_buy_percent": 48.049320217651605
+  },
+  {
+    "archive": "LOBSTER_SampleFile_MSFT_2012-06-21_10.zip",
+    "source_url": "https://php.lobsterdata.com/info/sample/LOBSTER_SampleFile_MSFT_2012-06-21_10.zip",
+    "archive_sha256": "0825e00ec83cb8ac8b53fd1efb7f2138b7848659e625c49621ebd9b55757be4c",
+    "message_file": "MSFT_2012-06-21_34200000_57600000_message_10.csv",
+    "message_sha256": "669e5c35b1eab0f7336fa9ed919002e65b08d2aabd96bb4ae88d647184e7a18d",
+    "first_time_seconds": "34200.01399412",
+    "last_time_seconds": "57599.907796528",
+    "total_events": 668765,
+    "counts": {
+      "1": 329566,
+      "2": 5602,
+      "3": 300183,
+      "4": 29798,
+      "5": 3616,
+      "6": 0,
+      "7": 0
+    },
+    "event_percent": {
+      "1": 49.27979185513596,
+      "2": 0.8376634542776611,
+      "3": 44.886170777477886,
+      "4": 4.455675760543689,
+      "5": 0.5406981525648022,
+      "6": 0.0,
+      "7": 0.0
+    },
+    "cancellation_event_percent": 45.723834231755546,
+    "full_delete_supported_command_percent": 47.667086410617564,
+    "combined_cancel_add_command_percent": 48.128514789462834,
+    "observed_submissions": 329566,
+    "observed_submissions_later_canceled": 299469,
+    "observed_submissions_with_later_cancel_percent": 90.86768659388407,
+    "submission_size_median": 300.0,
+    "submission_buy_percent": 47.00818652409532
+  }
+]

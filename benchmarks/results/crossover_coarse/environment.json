@@ -1,0 +1,22 @@
+{
+  "timestamp_utc": "2026-10-29T10:14:25.747834+00:00",
+  "system": "Linux-6.18.57-1-lts-x86_64-with-glibc2.44",
+  "cpu": "11th Gen Intel(R) Core(TM) i7-1165G7 @ 2.80GHz",
+  "pinned_cpu": 0,
+  "compiler": "c++ (GCC) 16.2.1 20260810",
+  "python": "3.14.8",
+  "modes": "batch",
+  "flags": [
+    "-std=c++20",
+    "-O3",
+    "-DNDEBUG"
+  ],
+  "harness_sha256": {
+    "engine_bench.cpp": "a0d5b29c041976b1414cffb819fabb03f2b418e601d67f3c8c69646d860b1cc3",
+    "run.py": "35dd35099d19d4421227677c7163d6b6ca5b10e4c87aeac718ea309f985e22d2"
+  },
+  "engines": {
+    "deque-baseline": "0e66556cd827a073bd152f2b899b6cb526e03327",
+    "main": "843ed414da0873ae9d537ed795a93855d0295a77"
+  }
+}

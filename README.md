@@ -95,7 +95,11 @@ Resting orders are indexed after insertion. Partial fills preserve their positio
 
 Here, `P` is the number of price levels on the relevant side and `K` is the number of orders at the queried level. Hash-table operations have worst-case linear complexity in the number of indexed orders.
 
-Lists provide stable iterators and efficient arbitrary removal, at the cost of node overhead, per-node allocations, and poorer cache locality than deques. These are design tradeoffs, not measured latency improvements; a workload-based benchmark comparison with the original deque version is still pending.
+Lists provide stable iterators and efficient arbitrary removal, at the cost of node overhead, per-node allocations, and poorer cache locality than deques. The [benchmark suite](benchmarks/README.md) compares committed versions on `deque-baseline` and `main` with 30%, 50%, and 70% cancellation-command workloads. See the [measured comparison and six individual reports](benchmarks/results/latest/REPORT.md) for results, workload definitions, and limitations; these synthetic measurements do not establish production capacity.
+
+Additional experiments use [cancellation frequencies measured from LOBSTER samples](benchmarks/analysis/lobster/REPORT.md), with [per-engine calibrated results](benchmarks/results/lobster/REPORT.md). A separate [crossover experiment](benchmarks/results/crossover_refined/CROSSOVER.md) searches for the smallest tested cancellation ratio at which the indexed design consistently improves total throughput. Calibration currently covers cancellation frequency only; it is not historical market replay, and the crossover depends on the workload and hardware.
+
+The [combined experiment report](benchmarks/STAGE1_REPORT.md) summarizes the LOBSTER calibration and crossover findings.
 
 `OrderBook` is non-copyable, which also makes `MatchingEngine` non-copyable. A default copy would duplicate the lists while leaving copied index iterators pointing into the original book. Supporting copies would require rebuilding the index for the copied lists. Neither class currently supports moving.
 
