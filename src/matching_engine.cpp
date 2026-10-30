@@ -4,7 +4,6 @@
 
 #include <limits>
 #include <optional>
-#include <stdexcept>
 #include <sys/types.h>
 #include <utility>
 
@@ -13,19 +12,33 @@ namespace matching {
     SubmitResult MatchingEngine::submit_limit_order(
         Side side,
         Price price,
-        Quantity quantity
+        Symbol symbol,
+        Quantity quantity,
+        TraderId traderId
     ) {
         // input validation
         if (price <= 0) {
-            throw std::invalid_argument("Price must be greater than 0!");
+            // throw std::invalid_argument("Price must be greater than 0!");
+            return SubmitResult {
+                .status = Status::Error,
+                .message = "Price must be greater than 0!"
+            };
         }
 
         if (quantity <= 0) {
-            throw std::invalid_argument("Quantity must be greater than 0!");
+            // throw std::invalid_argument("Quantity must be greater than 0!");
+            return SubmitResult {
+                .status = Status::Error,
+                .message = "Quantity must be greater than 0!"
+            };
         }
 
         if (side != Side::Buy && side != Side::Sell) {
-            throw std::invalid_argument("Side can only be BUY or SELL");
+            // throw std::invalid_argument("Side can only be BUY or SELL");
+            return SubmitResult {
+                .status = Status::Error,
+                .message = "Side can only be BUY or SELL!"
+            };
         }
 
         if (next_order_id_ >= std::numeric_limits<OrderId>::max()) {
@@ -34,12 +47,28 @@ namespace matching {
                 .message = "Order ID space is exhausted!"
             };
         }
+
+        if (traderId >= std::numeric_limits<TraderId>::max()) {
+            return SubmitResult {
+                .status = Status::Error,
+                .message = "Invalid trader ID!"
+            };
+        }
+
+        if (symbol.length() != 4) {
+            return SubmitResult {
+                .status = Status::Error,
+                .message = "Symbol length must be 4!"
+            };
+        }
+
         // creating a new order
-        Order order{
+        Order order {
             .id = next_order_id_++,
             .side = side,
             .price = price,
-            .quantity = quantity
+            .quantity = quantity,
+            .symbol = symbol
         };
 
         const OrderId order_id = order.id;

@@ -23,7 +23,9 @@ namespace matching {
         SubmitResult submit_limit_order(
             Side side,
             Price price,
-            Quantity quantity
+            Symbol symbol,
+            Quantity quantity,
+            TraderId traderId
         );
 
         bool cancel_order(OrderId order_id);

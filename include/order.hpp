@@ -13,9 +13,8 @@ namespace matching {
         Side side;
         Price price;
         Quantity quantity;
-
-        // Symbol symbol;
+        Symbol symbol;
         // Timestamp timestamp;
-        // TraderId trader_id;
+        TraderId trader_id;
     };
 } // end of namespace
