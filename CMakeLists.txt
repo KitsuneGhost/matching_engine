@@ -28,4 +28,15 @@ if(BUILD_TESTING)
     target_link_libraries(matching_engine_tests PRIVATE matching_engine_core)
 
     add_test(NAME matching_engine_tests COMMAND matching_engine_tests)
+
+    find_package(Python3 COMPONENTS Interpreter QUIET)
+    if(Python3_Interpreter_FOUND)
+        add_executable(matching_engine_reference_replay tests/reference_replay.cpp)
+        target_link_libraries(matching_engine_reference_replay PRIVATE matching_engine_core)
+        add_test(NAME matching_engine_differential
+            COMMAND ${Python3_EXECUTABLE} -B ${CMAKE_CURRENT_SOURCE_DIR}/tests/test_differential.py
+                    $<TARGET_FILE:matching_engine_reference_replay>)
+    else()
+        message(STATUS "Python3 not found: differential test disabled; C++ tests remain available")
+    endif()
 endif()

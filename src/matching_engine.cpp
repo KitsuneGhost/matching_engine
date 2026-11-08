@@ -16,7 +16,14 @@ namespace matching {
         Quantity quantity,
         TraderId traderId
     ) {
-        // input validation
+        // checking that trade belongs to this engine by symbol
+        if (engine_symbol_ != symbol) {
+            return SubmitResult {
+                .status = Status::Error,
+                .message = "Instrument does not match this engine"
+            };
+        }
+
         if (price <= 0) {
             // throw std::invalid_argument("Price must be greater than 0!");
             return SubmitResult {
@@ -68,7 +75,8 @@ namespace matching {
             .side = side,
             .price = price,
             .quantity = quantity,
-            .symbol = symbol
+            .symbol = symbol,
+            .trader_id = traderId
         };
 
         const OrderId order_id = order.id;

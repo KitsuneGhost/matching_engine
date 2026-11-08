@@ -11,7 +11,8 @@ namespace matching {
         Price price;
         Symbol symbol;
         // Timestamp timestamp;
-        TraderId trader_id;
+        TraderId buyer_id;
+        TraderId seller_id;
     };
 
 }

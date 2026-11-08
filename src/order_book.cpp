@@ -53,7 +53,10 @@ namespace matching {
                     .buy_order_id = order.id,
                     .sell_order_id = sell_order.id,
                     .quantity = traded_quantity,
-                    .price = sell_order.price
+                    .price = sell_order.price,
+                    .symbol = order.symbol,
+                    .buyer_id = order.trader_id,
+                    .seller_id = sell_order.trader_id,
                 });
 
                 order.quantity -= traded_quantity;
@@ -120,7 +123,10 @@ namespace matching {
                     .buy_order_id = buy_order.id,
                     .sell_order_id = order.id,
                     .quantity = traded_quantity,
-                    .price = buy_order.price
+                    .price = buy_order.price,
+                    .symbol = order.symbol,
+                    .buyer_id = buy_order.trader_id,
+                    .seller_id = order.trader_id,
                 });
 
                 order.quantity -= traded_quantity;
