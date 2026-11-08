@@ -14,7 +14,7 @@ namespace matching {
         Price price;
         Quantity quantity;
         Symbol symbol;
-        // Timestamp timestamp;
+        Timestamp accepted_at;
         TraderId trader_id;
     };
 } // end of namespace

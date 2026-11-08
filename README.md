@@ -54,6 +54,11 @@ The executable runs 23 C++ cases covering matching priority, partial sweeps,
 lookup cleanup, cancellation, identity propagation, symbol isolation, validation,
 ID allocation, quantity aggregation and overflow, and the current self-trade policy.
 
+CTest also runs a separate allocation-failure executable. It fails successive
+allocations during resting submissions on both sides, at new and existing price
+levels, and checks list/index consistency, cleanup, cancellation, and FIFO priority.
+It tests insertion rollback; it does not establish submission-wide atomicity.
+
 If Python 3 is available when CMake configures the project, CTest also runs
 `matching_engine_differential`. It compares execution and complete order-state
 digests against the independent Python reference model after each of 1,500
@@ -142,7 +147,9 @@ The [combined experiment report](benchmarks/STAGE1_REPORT.md) summarizes the LOB
 
 `OrderBook` is non-copyable, which also makes `MatchingEngine` non-copyable. A default copy would duplicate the lists while leaving copied index iterators pointing into the original book. Supporting copies would require rebuilding the index for the copied lists. Neither class currently supports moving.
 
-Allocation-failure recovery remains unfinished: if index insertion throws after a list append, the appended order is not rolled back. The current implementation does not guarantee that the book and index remain synchronized after an allocation failure during submission.
+Resting-order insertion rolls back its list node and any newly created empty price level if appending or indexing fails. Existing orders and their FIFO positions are preserved. Duplicate resting IDs are treated as a logic error and the attempted insertion is rolled back.
+
+This is **insertion rollback, not submission-wide atomicity**. An exception later in a multi-fill submission can leave earlier executions applied without returning their trade records; even building the success response can allocate after the book changes. Order IDs may also be consumed by failed submissions. Treat any exception during submission as fatal to the session: stop and discard that session rather than catching it and continuing as if the order had been rejected. Ordinary validation failures returning `Status::Error` remain safe to continue after. Full prepare/commit handling for submissions is not implemented yet.
 
 ## Project layout
 

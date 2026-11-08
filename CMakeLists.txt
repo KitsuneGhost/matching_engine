@@ -29,6 +29,11 @@ if(BUILD_TESTING)
 
     add_test(NAME matching_engine_tests COMMAND matching_engine_tests)
 
+    # Isolate allocation failure injection from the normal tests and demo.
+    add_executable(matching_engine_allocation_tests tests/test_allocation_failure.cpp)
+    target_link_libraries(matching_engine_allocation_tests PRIVATE matching_engine_core)
+    add_test(NAME matching_engine_allocation_tests COMMAND matching_engine_allocation_tests)
+
     find_package(Python3 COMPONENTS Interpreter QUIET)
     if(Python3_Interpreter_FOUND)
         add_executable(matching_engine_reference_replay tests/reference_replay.cpp)

@@ -69,6 +69,8 @@ namespace matching {
             };
         }
 
+        const Timestamp accepted_at = current_timestamp();
+
         // creating a new order
         Order order {
             .id = next_order_id_++,
@@ -76,7 +78,8 @@ namespace matching {
             .price = price,
             .quantity = quantity,
             .symbol = symbol,
-            .trader_id = traderId
+            .accepted_at = accepted_at,
+            .trader_id = traderId,
         };
 
         const OrderId order_id = order.id;

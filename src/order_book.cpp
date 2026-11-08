@@ -9,8 +9,46 @@
 #include <stdexcept>
 #include <vector>
 #include <optional>
+#include <utility>
 
 namespace matching {
+
+    template <typename PriceLevels>
+    void OrderBook::rest_order(PriceLevels& levels, const Order& order) {
+        // A resting order needs BOTH a list node and an index entry. If either
+        // allocation fails, undo this insertion before propagating the error.
+        // try_emplace does not change an existing level or its FIFO queue.
+        auto [level_it, created_level] = levels.try_emplace(order.price);
+        auto& queue = level_it->second;
+
+        try {
+            queue.push_back(order);
+        } catch (...) {
+            // Appending failed: an existing queue is unchanged, but a newly
+            // created empty level must be removed (best-price queries use front()).
+            if (created_level) levels.erase(level_it);
+            throw;
+        }
+
+        auto order_it = std::prev(queue.end());
+        try {
+            const auto [index_it, inserted] = order_index_.emplace(
+                order.id, OrderLocation{order.side, order.price, order_it});
+            if (!inserted) {
+                // IDs should be unique. Do not leave an unindexed duplicate if
+                // that invariant is ever broken; preserve the original entry.
+                throw std::logic_error("Duplicate resting order ID");
+            }
+        } catch (...) {
+            // Indexing failed: remove only our appended node, preserving earlier
+            // orders and their queue positions. These erase operations allocate nothing.
+            queue.erase(order_it);
+            if (queue.empty()) levels.erase(level_it);
+            throw;
+        }
+        // Both structures now contain the order. This rollback covers insertion
+        // only: it cannot undo fills already performed earlier in the submission.
+    }
 
     // adding an order
     AddOrderResult OrderBook::add_order(Order order) {
@@ -55,6 +93,7 @@ namespace matching {
                     .quantity = traded_quantity,
                     .price = sell_order.price,
                     .symbol = order.symbol,
+                    .executed_at = current_timestamp(),
                     .buyer_id = order.trader_id,
                     .seller_id = sell_order.trader_id,
                 });
@@ -75,21 +114,8 @@ namespace matching {
             }
         }
 
-        // if the order is not finished -> save it
-        if (order.quantity > 0) {
-            // a list of orders at current order's price
-            auto& queue = bids_[order.price];
-            queue.push_back(order);
-
-            // iterator to current order in the list
-            auto order_it = std::prev(queue.end());
-
-            order_index_.emplace(order.id, OrderLocation {
-                order.side,
-                order.price,
-                order_it,
-            });
-        }
+        // Keep allocation/rollback details out of the matching loop.
+        if (order.quantity > 0) rest_order(bids_, order);
 
         return AddOrderResult {
             .remaining_quantity = order.quantity,
@@ -125,6 +151,7 @@ namespace matching {
                     .quantity = traded_quantity,
                     .price = buy_order.price,
                     .symbol = order.symbol,
+                    .executed_at = current_timestamp(),
                     .buyer_id = buy_order.trader_id,
                     .seller_id = order.trader_id,
                 });
@@ -143,21 +170,12 @@ namespace matching {
             }
         }
 
-        if (order.quantity > 0) {
-            auto& queue = asks_[order.price];
-            queue.push_back(order);
-
-            auto order_it = std::prev(queue.end());
-            order_index_.emplace(order.id, OrderLocation {
-                order.side,
-                order.price,
-                order_it
-            });
-        }
+        // The same insertion invariant applies to resting sells.
+        if (order.quantity > 0) rest_order(asks_, order);
 
         return AddOrderResult{
             .remaining_quantity = order.quantity,
-            .trades = trades
+            .trades = std::move(trades) // Transfer fills without allocating a second vector.
         };
     }
 
