@@ -20,7 +20,7 @@ namespace matching {
     class MatchingEngine {
     public:
         explicit MatchingEngine(Symbol symbol)
-            : engine_symbol_(std::move(symbol)) {}
+            : engine_symbol_(std::move(symbol)) {}   // Store the supplied symbol.
 
         // a method to submit a new order
         SubmitResult submit_limit_order(

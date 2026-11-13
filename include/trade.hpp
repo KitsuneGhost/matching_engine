@@ -10,7 +10,7 @@ namespace matching {
         Quantity quantity;
         Price price;
         Symbol symbol;
-        // Timestamp timestamp;
+        Timestamp executed_at;
         TraderId buyer_id;
         TraderId seller_id;
     };

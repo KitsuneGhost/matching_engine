@@ -49,6 +49,10 @@ namespace matching {
             // index map for orders to insure O(1) search
             std::unordered_map<OrderId, OrderLocation> order_index_;
 
+            // Shared by buys and sells so insertion rollback stays in one place.
+            template <typename PriceLevels>
+            void rest_order(PriceLevels& levels, const Order& order);
+
             AddOrderResult add_order(Order order);
             bool cancel_order(OrderId order_id);
             void print_book() const;
