@@ -8,15 +8,13 @@ namespace matching {
         Buy, Sell
     };
 
-    struct Order{
+    struct Order {
         OrderId id;
         Side side;
         Price price;
         Quantity quantity;
-
-        // Symbol symbol;
-        // Timestamp timestamp;
-        // TraderId trader_id;
+        Symbol symbol;
+        Timestamp accepted_at;
+        TraderId trader_id;
     };
-
 } // end of namespace

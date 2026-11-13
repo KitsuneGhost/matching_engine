@@ -19,11 +19,16 @@ namespace matching {
 
     class MatchingEngine {
     public:
+        explicit MatchingEngine(Symbol symbol)
+            : engine_symbol_(std::move(symbol)) {}   // Store the supplied symbol.
+
         // a method to submit a new order
         SubmitResult submit_limit_order(
             Side side,
             Price price,
-            Quantity quantity
+            Symbol symbol,
+            Quantity quantity,
+            TraderId traderId
         );
 
         bool cancel_order(OrderId order_id);
@@ -39,6 +44,7 @@ namespace matching {
         std::optional<Order> get_order(OrderId id) const;
 
     private:
+        Symbol engine_symbol_;
         OrderId next_order_id_{1};
         OrderBook order_book_;
     };

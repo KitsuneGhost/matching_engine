@@ -4,12 +4,51 @@
 
 #include <algorithm>
 #include <iostream>
+#include <iterator>
 #include <limits>
 #include <stdexcept>
 #include <vector>
 #include <optional>
+#include <utility>
 
 namespace matching {
+
+    template <typename PriceLevels>
+    void OrderBook::rest_order(PriceLevels& levels, const Order& order) {
+        // A resting order needs BOTH a list node and an index entry. If either
+        // allocation fails, undo this insertion before propagating the error.
+        // try_emplace does not change an existing level or its FIFO queue.
+        auto [level_it, created_level] = levels.try_emplace(order.price);
+        auto& queue = level_it->second;
+
+        try {
+            queue.push_back(order);
+        } catch (...) {
+            // Appending failed: an existing queue is unchanged, but a newly
+            // created empty level must be removed (best-price queries use front()).
+            if (created_level) levels.erase(level_it);
+            throw;
+        }
+
+        auto order_it = std::prev(queue.end());
+        try {
+            const auto [index_it, inserted] = order_index_.emplace(
+                order.id, OrderLocation{order.side, order.price, order_it});
+            if (!inserted) {
+                // IDs should be unique. Do not leave an unindexed duplicate if
+                // that invariant is ever broken; preserve the original entry.
+                throw std::logic_error("Duplicate resting order ID");
+            }
+        } catch (...) {
+            // Indexing failed: remove only our appended node, preserving earlier
+            // orders and their queue positions. These erase operations allocate nothing.
+            queue.erase(order_it);
+            if (queue.empty()) levels.erase(level_it);
+            throw;
+        }
+        // Both structures now contain the order. This rollback covers insertion
+        // only: it cannot undo fills already performed earlier in the submission.
+    }
 
     // adding an order
     AddOrderResult OrderBook::add_order(Order order) {
@@ -34,9 +73,7 @@ namespace matching {
 
             // if the best selling price is higher than the order -> abort
             // the buyer simply doesnt want to pay that much
-            if (best_ask_price > order.price) {
-                break;
-            }
+            if (best_ask_price > order.price) {break;}
 
             // first deque of orders with the best price
             OrderQueue& orders_at_price = best_ask_it -> second;
@@ -50,11 +87,15 @@ namespace matching {
                 Quantity traded_quantity = std::min(order.quantity, sell_order.quantity);
 
                 // adding trade to trades list
-                trades.push_back(Trade{
+                trades.push_back(Trade {
                     .buy_order_id = order.id,
                     .sell_order_id = sell_order.id,
                     .quantity = traded_quantity,
-                    .price = sell_order.price
+                    .price = sell_order.price,
+                    .symbol = order.symbol,
+                    .executed_at = current_timestamp(),
+                    .buyer_id = order.trader_id,
+                    .seller_id = sell_order.trader_id,
                 });
 
                 order.quantity -= traded_quantity;
@@ -62,6 +103,7 @@ namespace matching {
 
                 // if sell order ran out of product - pick next best order
                 if (sell_order.quantity <= 0) {
+                    order_index_.erase(sell_order.id);   // deleting the order id from index list
                     orders_at_price.pop_front();
                 }
             }
@@ -72,10 +114,8 @@ namespace matching {
             }
         }
 
-        // if the order is not finished -> save it
-        if (order.quantity > 0) {
-            bids_[order.price].push_back(order);
-        }
+        // Keep allocation/rollback details out of the matching loop.
+        if (order.quantity > 0) rest_order(bids_, order);
 
         return AddOrderResult {
             .remaining_quantity = order.quantity,
@@ -109,13 +149,18 @@ namespace matching {
                     .buy_order_id = buy_order.id,
                     .sell_order_id = order.id,
                     .quantity = traded_quantity,
-                    .price = buy_order.price
+                    .price = buy_order.price,
+                    .symbol = order.symbol,
+                    .executed_at = current_timestamp(),
+                    .buyer_id = buy_order.trader_id,
+                    .seller_id = order.trader_id,
                 });
 
                 order.quantity -= traded_quantity;
                 buy_order.quantity -= traded_quantity;
 
                 if (buy_order.quantity <= 0) {
+                    order_index_.erase(buy_order.id);
                     orders_at_price.pop_front();
                 }
             }
@@ -125,76 +170,44 @@ namespace matching {
             }
         }
 
-        if (order.quantity > 0) {
-            asks_[order.price].push_back(order);
-        }
+        // The same insertion invariant applies to resting sells.
+        if (order.quantity > 0) rest_order(asks_, order);
 
         return AddOrderResult{
             .remaining_quantity = order.quantity,
-            .trades = trades
+            .trades = std::move(trades) // Transfer fills without allocating a second vector.
         };
     }
 
     // deletes an order from the book
     bool OrderBook::cancel_order(OrderId order_id) {
-        // looking for order in bids
-        for (auto price_it = bids_.begin(); price_it != bids_.end(); ++price_it) {
-            OrderQueue& orders = price_it->second;
+        // order's iterator
+        auto index_it = order_index_.find(order_id);
+        // if not in order_list return false (order doesnt exist)
+        if (index_it == order_index_.end()) {return false;}
 
-            // looking for our order
-            auto order_it = std::find_if(
-                orders.begin(),
-                orders.end(),
-                [order_id](const Order order) {
-                    return order.id == order_id;
-                }
-            );
+        const auto& location = index_it->second;
 
-            // if orer in deque -> erase it
-            if (order_it != orders.end()) {
-                orders.erase(order_it);
+        // figuring out which map order is located in and deleting it
+        if (location.side == Side::Buy) {
+            auto price_level_it = bids_.find(location.price);
+            auto& queue = price_level_it->second;   // actual list with orders
 
-                // if after erasing there are no more orders with that price tag
-                // delete the price tag
-                if (orders.empty()) {
-                    bids_.erase(price_it);
-                }
+            queue.erase(location.iterator);
 
-                // order was deleted
-                return true;
-            }
+            // if price level is now empty -> delete it
+            if (queue.empty()) {bids_.erase(price_level_it);}
+        } else {
+            auto price_level_it = asks_.find(location.price);
+            auto& queue = price_level_it->second;
+
+            queue.erase(location.iterator);
+
+            if (queue.empty()) {asks_.erase(price_level_it);}
         }
 
-        // looking for order in asks (if order was not in bids)
-        for (auto price_it = asks_.begin(); price_it != asks_.end(); ++price_it) {
-            OrderQueue& orders = price_it->second;
-
-            // looking for our order
-            auto order_it = std::find_if(
-                orders.begin(),
-                orders.end(),
-                [order_id](const Order order) {
-                    return order.id == order_id;
-                }
-            );
-
-            // if orer in deque -> erase it
-            if (order_it != orders.end()) {
-                orders.erase(order_it);
-
-                // if after erasing there are no more orders with that price tag
-                // delete the price tag
-                if (orders.empty()) {
-                    asks_.erase(price_it);
-                }
-
-                // order was deleted
-                return true;
-            }
-        }
-
-        // order was NOT deleted
-        return false;
+        order_index_.erase(index_it);
+        return true;
     }
 
     // prints the book
@@ -297,32 +310,11 @@ namespace matching {
     }
 
     std::optional<Order> OrderBook::get_order(OrderId id) const {
-        // looking for order with order_id == id in bids using lambda function
-        for (auto& [price, orders] : bids_) {
-            auto it = std::find_if(
-                orders.begin(),
-                orders.end(),
-                [id](const Order& order) {
-                    return order.id == id;
-                }
-            );
+        auto index_it = order_index_.find(id);
+        if (index_it == order_index_.end()) {return std::nullopt;}
 
-            if (it != orders.end()) return *it; // dereferencing the iterator
-        }
+        auto& location = index_it->second;
 
-        // looking for order with order_id == id in asks using lambda function
-        for (auto& [price, orders] : asks_) {
-            auto it = std::find_if(
-                orders.begin(),
-                orders.end(),
-                [id](const Order& order) {
-                    return order.id == id;
-                }
-            );
-
-            if (it != orders.end()) return *it;
-        }
-
-        return std::nullopt;
+        return *location.iterator;
     }
 }; // end of namespace matching

@@ -9,10 +9,10 @@ namespace matching {
         OrderId sell_order_id;
         Quantity quantity;
         Price price;
-
-        // Symbol symbol;
-        // Timestamp timestamp;
-        // TraderId trader_id;
+        Symbol symbol;
+        Timestamp executed_at;
+        TraderId buyer_id;
+        TraderId seller_id;
     };
 
 }
