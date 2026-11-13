@@ -166,4 +166,6 @@ Each engine supports one in-memory order book for its configured symbol and limi
 
 ## Version
 
-Current toy release: **0.1.0**
+Current toy release: **0.2.0**
+
+See [the changelog](CHANGELOG.md) for release details and API changes.
