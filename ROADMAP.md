@@ -4,26 +4,26 @@ Updated: 2026-11-13. Planning document: the unchecked items below are not implem
 
 ## Read this when returning to the project
 
-We originally considered connecting the engine to Alpaca. We then chose a more
-useful first objective: understand market mechanics by rebuilding a recorded
+The original plan was to connect the engine to Alpaca. The current first
+objective is to understand market mechanics by rebuilding a recorded
 market and experimenting with pretend orders. Alpaca integration comes later.
 
 The eventual research question is: **when does waiting with a limit order save
 money compared with buying immediately, once missed fills and price movements
-are included?** We do not need a sophisticated strategy to begin answering it.
+are included?** A simple strategy is enough to begin answering it.
 
 The engine is the foundation, not the whole simulator:
 
 1. A matching engine decides trades between the orders supplied to it.
 2. A historical book reconstructor applies messages describing trades and order
    changes that already happened.
-3. An execution simulator estimates what would have happened to our pretend
+3. An execution simulator estimates what would have happened to a hypothetical
    order alongside that recorded market.
 4. A research runner compares decisions and measures the results.
 
 These jobs can share storage machinery, but have different rules. In particular,
 historical reconstruction must not invent executions by automatically matching
-recorded orders. The feed already tells us which executions occurred.
+recorded orders. The feed already specifies which executions occurred.
 
 **Next task: implement Step 1, explicit event timestamps.** Then follow the
 numbered steps below. Do not begin with networking or a new trading strategy.
