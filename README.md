@@ -164,6 +164,15 @@ tests/      Dependency-free test executable
 
 Each engine supports one in-memory order book for its configured symbol and limit orders only. Multiple symbols require separate engine instances. The project does not yet provide an exchange routing layer, trader accounts, cash/inventory accounting, ownership-checked cancellation, market orders, persistence, networking, concurrency, risk checks, or exchange-grade performance characteristics.
 
+## Development roadmaps
+
+The roadmaps describe planned work and completion checks; unchecked items are not implemented features.
+
+- [Main roadmap: historical replay and execution research](ROADMAP.md) is the current development plan. It explains the engine changes needed for deterministic historical book reconstruction, then outlines simulated order fills and execution-policy comparisons. The first steps include implementation guidance, examples, tests, and handoff notes to make it easy to resume work.
+- [Alpaca integration roadmap](ROADMAP_ALPACA.md) preserves the later broker-integration plan: paper trading, asynchronous order updates, persistence and recovery, market data, and risk controls. Alpaca execution will be a separate backend from local matching and historical replay.
+
+Start with the main roadmap. The immediate milestone is to replay a small event file and verify the book after every event.
+
 ## Version
 
 Current toy release: **0.2.0**
